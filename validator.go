@@ -34,29 +34,30 @@ func Optional(defaultVal ...interface{}) Validator {
 // Int 参数为整形
 func Int(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		switch opts.Value.(type) {
-		case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
-			return Succ()
+		_, ok := getIntValue(opts.Value)
+		if !ok {
+			return Fail(emsg)
 		}
-		return Fail(emsg)
+		return Succ()
 	}
 }
 
 // Float 浮点数
 func Float(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		switch opts.Value.(type) {
-		case float32, float64, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
-			return Succ()
+		_, ok := getFloatValue(opts.Value)
+		if !ok {
+			return Fail(emsg)
 		}
-		return Fail(emsg)
+		return Succ()
 	}
 }
 
 // EmptyString 空字符串，跳过后续校验规则
 func EmptyString() Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		if val, ok := opts.Value.(string); ok && len(val) == 0 {
+		str, ok := getStringValue(opts.Value)
+		if ok && len(str) == 0 {
 			return Break()
 		}
 		return Succ()
@@ -105,12 +106,8 @@ func ResetKey(newKey string) Validator {
 // Boolean 布尔值
 func Boolean(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		val, ok := opts.Value.(string)
+		_, ok := getBooleanValue(opts.Value)
 		if !ok {
-			return Fail(emsg)
-		}
-		_, err := strconv.ParseBool(val)
-		if err != nil {
 			return Fail(emsg)
 		}
 		return Succ()
@@ -120,7 +117,7 @@ func Boolean(emsg ...string) Validator {
 // Email 邮件
 func Email(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		val, ok := opts.Value.(string)
+		val, ok := getStringValue(opts.Value)
 		if !ok {
 			return Fail(emsg)
 		}
@@ -135,7 +132,7 @@ func Email(emsg ...string) Validator {
 // Url URL链接
 func Url(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		val, ok := opts.Value.(string)
+		val, ok := getStringValue(opts.Value)
 		if !ok {
 			return Fail(emsg)
 		}
@@ -156,7 +153,7 @@ func Url(emsg ...string) Validator {
 // Phone 手机号码
 func Phone(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		val, ok := opts.Value.(string)
+		val, ok := getStringValue(opts.Value)
 		if !ok {
 			return Fail(emsg)
 		}
@@ -171,7 +168,7 @@ func Phone(emsg ...string) Validator {
 // Ipv4 ip地址，v4格式
 func Ipv4(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		val, ok := opts.Value.(string)
+		val, ok := getStringValue(opts.Value)
 		if !ok {
 			return Fail(emsg)
 		}
@@ -186,7 +183,7 @@ func Ipv4(emsg ...string) Validator {
 // Date 日期，格式： 2006-01-02
 func Date(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		val, ok := opts.Value.(string)
+		val, ok := getStringValue(opts.Value)
 		if !ok {
 			return Fail(emsg)
 		}
@@ -201,7 +198,7 @@ func Date(emsg ...string) Validator {
 // Datetime 时间，格式：2006-01-02 15:04:05
 func Datetime(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		val, ok := opts.Value.(string)
+		val, ok := getStringValue(opts.Value)
 		if !ok {
 			return Fail(emsg)
 		}
@@ -216,7 +213,7 @@ func Datetime(emsg ...string) Validator {
 // Length 字符串字符长度限制 [min,max]
 func Length(min int, max int, emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		val, ok := opts.Value.(string)
+		val, ok := getStringValue(opts.Value)
 		if !ok {
 			return Fail(emsg)
 		}
@@ -231,7 +228,7 @@ func Length(min int, max int, emsg ...string) Validator {
 // Between 数字值范围限制 [min,max]
 func Between(min int, max int, emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		val, ok := opts.Value.(int)
+		val, ok := getIntValue(opts.Value)
 		if !ok {
 			return Fail(emsg)
 		}
@@ -245,7 +242,7 @@ func Between(min int, max int, emsg ...string) Validator {
 // EnumInt 枚举，值类型为整形
 func EnumInt(enums []int, emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		val, ok := opts.Value.(int)
+		val, ok := getIntValue(opts.Value)
 		if !ok {
 			return Fail(emsg)
 		}
@@ -261,7 +258,7 @@ func EnumInt(enums []int, emsg ...string) Validator {
 // EnumString 枚举，值类型为字符串
 func EnumString(enums []string, emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		val, ok := opts.Value.(string)
+		val, ok := getStringValue(opts.Value)
 		if !ok {
 			return Fail(emsg)
 		}
@@ -277,7 +274,7 @@ func EnumString(enums []string, emsg ...string) Validator {
 // DotInt 英文逗号分隔的整数
 func DotInt(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		val, ok := opts.Value.(string)
+		val, ok := getStringValue(opts.Value)
 		if !ok {
 			return Fail(emsg)
 		}
@@ -292,7 +289,7 @@ func DotInt(emsg ...string) Validator {
 // Maxdot 逗号分隔的ID支持的最多ID个数
 func Maxdot(max int, emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		val, ok := opts.Value.(string)
+		val, ok := getStringValue(opts.Value)
 		if !ok {
 			return Fail(emsg)
 		}
@@ -308,7 +305,7 @@ func Maxdot(max int, emsg ...string) Validator {
 // 忽略了错误处理，需在DotInt规则后使用
 func Dotint2Slice() Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		val, _ := opts.Value.(string)
+		val, _ := getStringValue(opts.Value)
 		vals := strings.Split(val, ",")
 		if len(vals) > 0 {
 			ids := make([]int, len(vals))
@@ -325,7 +322,7 @@ func Dotint2Slice() Validator {
 // Regex 正则表达式
 func Regex(reg string, emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		val, ok := opts.Value.(string)
+		val, ok := getStringValue(opts.Value)
 		if !ok {
 			return Fail(emsg)
 		}

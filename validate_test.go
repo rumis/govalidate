@@ -23,7 +23,7 @@ func TestValidate(t *testing.T) {
 
 	// error code
 	params = map[string]interface{}{
-		"age": "1",
+		"age": "s",
 	}
 	rules = map[string]FilterItem{
 		"age": Filter([]Validator{Int()}, "错误信息", "10086"),
