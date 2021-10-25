@@ -3,6 +3,7 @@ package govalidate
 import (
 	"testing"
 
+	"github.com/rumis/govalidate/executor"
 	"github.com/rumis/govalidate/utils"
 	"github.com/rumis/govalidate/validator"
 )
@@ -317,6 +318,17 @@ func TestValidate(t *testing.T) {
 		t.Error("offset error")
 	}
 
+	// 切片
+	params = map[string]interface{}{
+		"s1": []string{"1", "2"},
+	}
+	rules = map[string]validator.FilterItem{
+		"s1": Filter([]validator.Validator{validator.Required(), validator.IntSlice("切片异常", executor.EnumInt([]int{1, 2, 3, 4}))}),
+	}
+	_, _, err = Validate(params, rules)
+	if err != nil {
+		t.Error(err)
+	}
 }
 
 func BenchmarkValidate(b *testing.B) {

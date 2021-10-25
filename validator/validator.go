@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"unicode/utf8"
 
 	"github.com/rumis/govalidate/executor"
 	"github.com/rumis/govalidate/utils"
@@ -210,8 +209,8 @@ func Length(min int, max int, emsg ...string) Validator {
 		if !ok {
 			return Fail(emsg)
 		}
-		l := utf8.RuneCountInString(val)
-		if l < min || l > max {
+		ok = executor.Length(min, max)(val)
+		if !ok {
 			return Fail(emsg)
 		}
 		return Succ()
@@ -225,7 +224,8 @@ func Between(min int, max int, emsg ...string) Validator {
 		if !ok {
 			return Fail(emsg)
 		}
-		if val < min || val > max {
+		ok = executor.Between(min, max)(val)
+		if !ok {
 			return Fail(emsg)
 		}
 		return Succ()
@@ -239,12 +239,11 @@ func EnumInt(enums []int, emsg ...string) Validator {
 		if !ok {
 			return Fail(emsg)
 		}
-		for _, v := range enums {
-			if val == v {
-				return Succ()
-			}
+		ok = executor.EnumInt(enums)(val)
+		if !ok {
+			return Fail(emsg)
 		}
-		return Fail(emsg)
+		return Succ()
 	}
 }
 
@@ -255,12 +254,11 @@ func EnumString(enums []string, emsg ...string) Validator {
 		if !ok {
 			return Fail(emsg)
 		}
-		for _, v := range enums {
-			if val == v {
-				return Succ()
-			}
+		ok = executor.EnumString(enums)(val)
+		if !ok {
+			return Fail(emsg)
 		}
-		return Fail(emsg)
+		return Succ()
 	}
 }
 
@@ -359,12 +357,105 @@ func Paginate(fields ...string) Validator {
 }
 
 // IntSlice 整形数组
-func IntSlice() Validator {
+// 一个参数：可以是【错误信息】或者是【单个要素的校验条件】，校验条件可为单个或数组
+// 两个参数：第一个参数一定为【错误信息】，第二个参数为【单个要素的校验条件】，校验条件可为单个或数组
+func IntSlice(msgExecutor ...interface{}) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		errMsgs := make([]string, 0)
+		execs := make([]executor.IntExecutor, 0)
+		paramLen := len(msgExecutor)
 
-	return nil
+		switch paramLen {
+		case 0:
+			// nothing to do
+		case 1:
+			switch p := msgExecutor[0].(type) {
+			case string:
+				errMsgs = append(errMsgs, p)
+			case executor.IntExecutor:
+				execs = append(execs, p)
+			case []executor.IntExecutor:
+				execs = append(execs, p...)
+			}
+		case 2:
+			errMsg, ok := msgExecutor[0].(string)
+			if !ok {
+				return Fail(errMsgs)
+			}
+			errMsgs = append(errMsgs, errMsg)
+			switch p := msgExecutor[1].(type) {
+			case executor.IntExecutor:
+				execs = append(execs, p)
+			case []executor.IntExecutor:
+				execs = append(execs, p...)
+			}
+		}
+		vals, ok := utils.GetIntSlice(opts.Value)
+		if !ok {
+			return Fail(errMsgs)
+		}
+		if len(execs) > 0 {
+			for _, exe := range execs {
+				for _, val := range vals {
+					ok = exe(val)
+					if !ok {
+						return Fail(errMsgs)
+					}
+				}
+			}
+		}
+		return Succ()
+	}
 }
 
-func StringSlice() Validator {
+// StringSlice 字符串数组
+// 一个参数：可以是【错误信息】或者是【单个要素的校验条件】，校验条件可为单个或数组
+// 两个参数：第一个参数一定为【错误信息】，第二个参数为【单个要素的校验条件】，校验条件可为单个或数组
+func StringSlice(msgExecutor ...interface{}) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		errMsgs := make([]string, 0)
+		execs := make([]executor.StringExecutor, 0)
+		paramLen := len(msgExecutor)
 
-	return nil
+		switch paramLen {
+		case 0:
+			// nothing to do
+		case 1:
+			switch p := msgExecutor[0].(type) {
+			case string:
+				errMsgs = append(errMsgs, p)
+			case executor.StringExecutor:
+				execs = append(execs, p)
+			case []executor.StringExecutor:
+				execs = append(execs, p...)
+			}
+		case 2:
+			errMsg, ok := msgExecutor[0].(string)
+			if !ok {
+				return Fail(errMsgs)
+			}
+			errMsgs = append(errMsgs, errMsg)
+			switch p := msgExecutor[1].(type) {
+			case executor.StringExecutor:
+				execs = append(execs, p)
+			case []executor.StringExecutor:
+				execs = append(execs, p...)
+			}
+		}
+		vals, ok := utils.GetStringSlice(opts.Value)
+		if !ok {
+			return Fail(errMsgs)
+		}
+		if len(execs) > 0 {
+			for _, exe := range execs {
+				for _, val := range vals {
+					ok = exe(val)
+					if !ok {
+						return Fail(errMsgs)
+					}
+				}
+			}
+		}
+		return Succ()
+	}
 }
