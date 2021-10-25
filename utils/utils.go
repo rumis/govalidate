@@ -1,21 +1,30 @@
-package govalidate
+package utils
 
 import (
 	"encoding/json"
 	"strconv"
 )
 
-// map中读取int值
-func getIntValFromMap(key string, vals map[string]interface{}) (int, bool) {
+// GetIntValFromMap map中读取int值
+func GetIntValFromMap(key string, vals map[string]interface{}) (int, bool) {
 	iv, ok := vals[key]
 	if !ok {
 		return 0, false
 	}
-	return getIntValue(iv)
+	return GetIntValue(iv)
 }
 
-// getIntValue 转为整数
-func getIntValue(val interface{}) (int, bool) {
+// GetStringValFromMap map中读取string值
+func GetStringValFromMap(key string, vals map[string]interface{}) (string, bool) {
+	sv, ok := vals[key]
+	if !ok {
+		return "", false
+	}
+	return GetStringValue(sv)
+}
+
+// GetIntValue 转为整数
+func GetIntValue(val interface{}) (int, bool) {
 	switch v := val.(type) {
 	case uint8:
 		return int(v), true
@@ -53,8 +62,8 @@ func getIntValue(val interface{}) (int, bool) {
 	return 0, false
 }
 
-// getFloatValue 转为浮点
-func getFloatValue(val interface{}) (float64, bool) {
+// GetFloatValue 转为浮点
+func GetFloatValue(val interface{}) (float64, bool) {
 	switch v := val.(type) {
 	case uint8:
 		return float64(v), true
@@ -96,8 +105,8 @@ func getFloatValue(val interface{}) (float64, bool) {
 	return 0, false
 }
 
-// getStringValue 获取字符串
-func getStringValue(val interface{}) (string, bool) {
+// GetStringValue 获取字符串
+func GetStringValue(val interface{}) (string, bool) {
 	switch v := val.(type) {
 	case uint8:
 		return strconv.FormatUint(uint64(v), 10), true
@@ -131,8 +140,8 @@ func getStringValue(val interface{}) (string, bool) {
 	return "", false
 }
 
-// getBooleanValue 获取布尔值
-func getBooleanValue(val interface{}) (bool, bool) {
+// GetBooleanValue 获取布尔值
+func GetBooleanValue(val interface{}) (bool, bool) {
 	switch v := val.(type) {
 	case bool:
 		return v, true
@@ -150,4 +159,55 @@ func getBooleanValue(val interface{}) (bool, bool) {
 		return vbool, true
 	}
 	return false, false
+}
+
+// GetIntSlice 获取整形数组
+func GetIntSlice(val interface{}) ([]int, bool) {
+	switch vSlice := val.(type) {
+	case []int:
+		return vSlice, true
+	case []string:
+		res := make([]int, len(vSlice))
+		for k, v := range vSlice {
+			vi, err := strconv.Atoi(v)
+			if err != nil {
+				return []int{}, false
+			}
+			res[k] = int(vi)
+		}
+		return res, true
+	case []json.Number:
+		res := make([]int, len(vSlice))
+		for k, v := range vSlice {
+			vi, err := v.Int64()
+			if err != nil {
+				return []int{}, false
+			}
+			res[k] = int(vi)
+		}
+		return res, true
+	}
+	return []int{}, false
+}
+
+// GetStringSlice 获取字符串数组
+func GetStringSlice(val interface{}) ([]string, bool) {
+	switch vSlice := val.(type) {
+	case []int:
+		res := make([]string, len(vSlice))
+		for k, v := range vSlice {
+			vs := strconv.FormatInt(int64(v), 10)
+			res[k] = vs
+		}
+		return res, true
+	case []string:
+		return vSlice, true
+	case []json.Number:
+		res := make([]string, len(vSlice))
+		for k, v := range vSlice {
+			res[k] = v.String()
+		}
+		return res, true
+	}
+	return []string{}, false
 }

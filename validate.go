@@ -4,43 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+
+	"github.com/rumis/govalidate/validator"
 )
-
-// ValidateStatus 规则校验结果
-type ValidateStatus int8
-
-const (
-	VS_BREAK   ValidateStatus = 1
-	VS_FAILUE  ValidateStatus = 2
-	VS_SUCCESS ValidateStatus = 4
-)
-
-type ValidateOptions struct {
-	Key    string
-	Value  interface{}
-	Params map[string]interface{}
-	Extend map[string]interface{}
-}
-
-// Validator 规则
-type Validator func(opts *ValidateOptions) ValidateResult
-
-// ValidateResult 规则校验结果
-type ValidateResult struct {
-	Stat ValidateStatus
-	Emsg error
-}
-
-// FilterItem 校验规则结构
-type FilterItem struct {
-	Rules   []Validator
-	ErrMsg  error
-	ErrCode int32
-}
 
 // Filter 构建新的FilterItem对象
-func Filter(rules []Validator, errMsgCode ...string) FilterItem {
-	item := FilterItem{
+func Filter(rules []validator.Validator, errMsgCode ...string) validator.FilterItem {
+	item := validator.FilterItem{
 		Rules: rules,
 	}
 	if len(errMsgCode) > 0 {
@@ -54,7 +24,7 @@ func Filter(rules []Validator, errMsgCode ...string) FilterItem {
 }
 
 // Validate 校验
-func Validate(params map[string]interface{}, rules map[string]FilterItem) (map[string]interface{}, int32, error) {
+func Validate(params map[string]interface{}, rules map[string]validator.FilterItem) (map[string]interface{}, int32, error) {
 	if len(rules) == 0 {
 		return nil, 0, nil
 	}
@@ -64,17 +34,17 @@ func Validate(params map[string]interface{}, rules map[string]FilterItem) (map[s
 		if !ok {
 			paramVal = nil
 		}
-		opts := &ValidateOptions{
+		opts := &validator.ValidateOptions{
 			Key:    key,
 			Value:  paramVal,
 			Params: params,
 		}
 		for _, fn := range filter.Rules {
 			res := fn(opts)
-			if res.Stat == VS_BREAK {
+			if res.Stat == validator.VS_BREAK {
 				break
 			}
-			if res.Stat == VS_FAILUE {
+			if res.Stat == validator.VS_FAILUE {
 				if res.Emsg != nil {
 					return vRes, filter.ErrCode, res.Emsg
 				}
@@ -96,31 +66,4 @@ func Validate(params map[string]interface{}, rules map[string]FilterItem) (map[s
 		}
 	}
 	return vRes, 1, nil
-}
-
-// Succ 规则校验通过
-func Succ() ValidateResult {
-	return ValidateResult{
-		Stat: VS_SUCCESS,
-		Emsg: nil,
-	}
-}
-
-// Fail 规则校验失败
-func Fail(emsg []string) ValidateResult {
-	result := ValidateResult{
-		Stat: VS_FAILUE,
-	}
-	if len(emsg) > 0 {
-		result.Emsg = errors.New(emsg[0])
-	}
-	return result
-}
-
-// Break 中断后续校验流程
-func Break() ValidateResult {
-	return ValidateResult{
-		Stat: VS_BREAK,
-		Emsg: nil,
-	}
 }

@@ -1,4 +1,4 @@
-package govalidate
+package executor
 
 import "regexp"
 
