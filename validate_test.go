@@ -90,7 +90,7 @@ func TestValidate(t *testing.T) {
 	if !ok {
 		t.Error("float params not found")
 	}
-	f1, ok := fi1.(int)
+	f1, ok := fi1.(float64)
 	if !ok {
 		t.Error("int can't as float")
 	}
@@ -135,6 +135,7 @@ func TestValidate(t *testing.T) {
 
 	// URL
 	params = map[string]interface{}{
+		"u2": "",
 		"u3": "https://baidu.com",
 		"u4": "http://www.baidu.com",
 		"u5": "https://www.baidu.com?x=3",

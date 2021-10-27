@@ -3,6 +3,7 @@ package executor
 import (
 	"net"
 	"net/url"
+	"reflect"
 	"regexp"
 	"strings"
 	"time"
@@ -131,4 +132,30 @@ func Regex(reg string) StringExecutor {
 	return func(val string) bool {
 		return regExpr.MatchString(val)
 	}
+}
+
+func IsNil(val interface{}) bool {
+	if val == nil {
+		return true
+	}
+	switch v := val.(type) {
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+		if v == 0 {
+			return true
+		}
+	case float32, float64:
+		if v == 0 {
+			return true
+		}
+	case string:
+		if len(v) == 0 {
+			return true
+		}
+	default:
+		vo := reflect.ValueOf(val)
+		if vo.IsNil() || vo.IsZero() || !vo.IsValid() {
+			return true
+		}
+	}
+	return false
 }

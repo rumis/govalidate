@@ -1,7 +1,6 @@
 package validator
 
 import (
-	"reflect"
 	"strconv"
 	"strings"
 
@@ -22,7 +21,7 @@ func Required(emsg ...string) Validator {
 // Optional 参数可选，可设置默认值
 func Optional(defaultVal ...interface{}) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		if opts.Value == nil && len(defaultVal) != 0 {
+		if executor.IsNil(opts.Value) && len(defaultVal) != 0 {
 			opts.Value = defaultVal[0]
 		}
 		return Succ()
@@ -68,27 +67,8 @@ func EmptyString() Validator {
 // OmitEmpty 允许空
 func OmitEmpty() Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		if opts.Value == nil {
+		if executor.IsNil(opts.Value) {
 			return Break()
-		}
-		switch val := opts.Value.(type) {
-		case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
-			if val == 0 {
-				return Break()
-			}
-		case float32, float64:
-			if val == 0 {
-				return Break()
-			}
-		case string:
-			if len(val) == 0 {
-				return Break()
-			}
-		default:
-			vo := reflect.ValueOf(val)
-			if vo.IsNil() || vo.IsZero() || !vo.IsValid() {
-				return Break()
-			}
 		}
 		return Succ()
 	}
