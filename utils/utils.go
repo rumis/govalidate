@@ -186,6 +186,16 @@ func GetIntSlice(val interface{}) ([]int, bool) {
 			res[k] = int(vi)
 		}
 		return res, true
+	case []interface{}:
+		res := make([]int, len(vSlice))
+		for k, v := range vSlice {
+			vi, ok := GetIntValue(v)
+			if !ok {
+				return []int{}, false
+			}
+			res[k] = int(vi)
+		}
+		return res, true
 	}
 	return []int{}, false
 }
@@ -206,6 +216,16 @@ func GetStringSlice(val interface{}) ([]string, bool) {
 		res := make([]string, len(vSlice))
 		for k, v := range vSlice {
 			res[k] = v.String()
+		}
+		return res, true
+	case []interface{}:
+		res := make([]string, len(vSlice))
+		for k, v := range vSlice {
+			vi, ok := GetStringValue(v)
+			if !ok {
+				return []string{}, false
+			}
+			res[k] = vi
 		}
 		return res, true
 	}
