@@ -32,10 +32,11 @@ func Optional(defaultVal ...interface{}) Validator {
 // Int 参数为整形
 func Int(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		_, ok := utils.GetIntValue(opts.Value)
+		v, ok := utils.GetIntValue(opts.Value)
 		if !ok {
 			return Fail(emsg)
 		}
+		opts.Value = v
 		return Succ()
 	}
 }
@@ -43,10 +44,11 @@ func Int(emsg ...string) Validator {
 // Float 浮点数
 func Float(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		_, ok := utils.GetFloatValue(opts.Value)
+		v, ok := utils.GetFloatValue(opts.Value)
 		if !ok {
 			return Fail(emsg)
 		}
+		opts.Value = v
 		return Succ()
 	}
 }
@@ -58,6 +60,7 @@ func EmptyString() Validator {
 		if ok && len(str) == 0 {
 			return Break()
 		}
+		opts.Value = str
 		return Succ()
 	}
 }
@@ -104,10 +107,11 @@ func ResetKey(newKey string) Validator {
 // Boolean 布尔值
 func Boolean(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
-		_, ok := utils.GetBooleanValue(opts.Value)
+		v, ok := utils.GetBooleanValue(opts.Value)
 		if !ok {
 			return Fail(emsg)
 		}
+		opts.Value = v
 		return Succ()
 	}
 }
@@ -243,6 +247,7 @@ func EnumInt(enums []int, emsg ...string) Validator {
 		if !ok {
 			return Fail(emsg)
 		}
+		opts.Value = val
 		return Succ()
 	}
 }
@@ -258,6 +263,7 @@ func EnumString(enums []string, emsg ...string) Validator {
 		if !ok {
 			return Fail(emsg)
 		}
+		opts.Value = val
 		return Succ()
 	}
 }
@@ -404,6 +410,7 @@ func IntSlice(msgExecutor ...interface{}) Validator {
 				}
 			}
 		}
+		opts.Value = vals
 		return Succ()
 	}
 }
@@ -456,6 +463,7 @@ func StringSlice(msgExecutor ...interface{}) Validator {
 				}
 			}
 		}
+		opts.Value = vals
 		return Succ()
 	}
 }
