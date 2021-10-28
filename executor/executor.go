@@ -1,6 +1,7 @@
 package executor
 
 import (
+	"encoding/json"
 	"net"
 	"net/url"
 	"reflect"
@@ -149,6 +150,14 @@ func IsNil(val interface{}) bool {
 		}
 	case string:
 		if len(v) == 0 {
+			return true
+		}
+	case json.Number:
+		vi, err := v.Int64()
+		if err != nil {
+			return true
+		}
+		if vi == 0 {
 			return true
 		}
 	default:
