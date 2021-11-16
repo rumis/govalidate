@@ -27,6 +27,7 @@ type ValidateResult struct {
 
 // FilterItem 校验规则结构
 type FilterItem struct {
+	Key     string
 	Rules   []Validator
 	ErrMsg  error
 	ErrCode int32

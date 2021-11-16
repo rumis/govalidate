@@ -14,8 +14,8 @@ func TestValidate(t *testing.T) {
 	params := map[string]interface{}{
 		"age": 1,
 	}
-	rules := map[string]validator.FilterItem{
-		"age": Filter([]validator.Validator{validator.Int()}),
+	rules := []validator.FilterItem{
+		NewFilter("age", []validator.Validator{validator.Int()}),
 	}
 	res, _, err := Validate(params, rules)
 	if err != nil {
@@ -29,8 +29,8 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"age": "s",
 	}
-	rules = map[string]validator.FilterItem{
-		"age": Filter([]validator.Validator{validator.Int()}, "错误信息", "10086"),
+	rules = []validator.FilterItem{
+		NewFilter("age", []validator.Validator{validator.Int()}, "错误信息", "10086"),
 	}
 	_, code, err := Validate(params, rules)
 	if err == nil || err.Error() != "错误信息" {
@@ -41,8 +41,8 @@ func TestValidate(t *testing.T) {
 	}
 
 	// required
-	rules = map[string]validator.FilterItem{
-		"name": Filter([]validator.Validator{validator.Required("参数X必须")}),
+	rules = []validator.FilterItem{
+		NewFilter("name", []validator.Validator{validator.Required("参数X必须")}),
 	}
 	_, _, err = Validate(params, rules)
 	if err == nil || err.Error() != "参数X必须" {
@@ -50,9 +50,9 @@ func TestValidate(t *testing.T) {
 	}
 
 	// optional
-	rules = map[string]validator.FilterItem{
-		"name":  Filter([]validator.Validator{validator.Optional("默认值")}),
-		"grade": Filter([]validator.Validator{validator.Optional()}),
+	rules = []validator.FilterItem{
+		NewFilter("name", []validator.Validator{validator.Optional("默认值")}),
+		NewFilter("grade", []validator.Validator{validator.Optional()}),
 	}
 	res, _, err = Validate(params, rules)
 	if err != nil {
@@ -74,13 +74,13 @@ func TestValidate(t *testing.T) {
 		"name5": "true",
 		"name6": 2,
 	}
-	rules = map[string]validator.FilterItem{
-		"name1": Filter([]validator.Validator{validator.Int()}),
-		"name2": Filter([]validator.Validator{validator.OmitEmpty()}),
-		"name3": Filter([]validator.Validator{validator.Float()}),
-		"name4": Filter([]validator.Validator{validator.Float()}),
-		"name5": Filter([]validator.Validator{validator.Boolean()}),
-		"name6": Filter([]validator.Validator{validator.Required()}),
+	rules = []validator.FilterItem{
+		NewFilter("name1", []validator.Validator{validator.Int()}),
+		NewFilter("name2", []validator.Validator{validator.OmitEmpty()}),
+		NewFilter("name3", []validator.Validator{validator.Float()}),
+		NewFilter("name4", []validator.Validator{validator.Float()}),
+		NewFilter("name5", []validator.Validator{validator.Boolean()}),
+		NewFilter("name6", []validator.Validator{validator.Required()}),
 	}
 	res, _, err = Validate(params, rules)
 	if err != nil {
@@ -115,8 +115,8 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"e1": "liumurong1@tal.com",
 	}
-	rules = map[string]validator.FilterItem{
-		"e1": Filter([]validator.Validator{validator.Required(), validator.Email()}),
+	rules = []validator.FilterItem{
+		NewFilter("e1", []validator.Validator{validator.Required(), validator.Email()}),
 	}
 	_, _, err = Validate(params, rules)
 	if err != nil {
@@ -125,8 +125,8 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"e1": "@tal.com",
 	}
-	rules = map[string]validator.FilterItem{
-		"e1": Filter([]validator.Validator{validator.Required(), validator.Email()}),
+	rules = []validator.FilterItem{
+		NewFilter("e1", []validator.Validator{validator.Required(), validator.Email()}),
 	}
 	_, _, err = Validate(params, rules)
 	if err == nil {
@@ -141,13 +141,13 @@ func TestValidate(t *testing.T) {
 		"u5": "https://www.baidu.com?x=3",
 		"u6": "https://www.baidu.com#de",
 	}
-	rules = map[string]validator.FilterItem{
-		"u1": Filter([]validator.Validator{validator.Optional(), validator.OmitEmpty(), validator.Url()}),
-		"u2": Filter([]validator.Validator{validator.Optional(), validator.OmitEmpty(), validator.Url()}),
-		"u3": Filter([]validator.Validator{validator.Required(), validator.Url()}),
-		"u4": Filter([]validator.Validator{validator.Required(), validator.Url()}),
-		"u5": Filter([]validator.Validator{validator.Required(), validator.Url()}),
-		"u6": Filter([]validator.Validator{validator.Required(), validator.Url()}),
+	rules = []validator.FilterItem{
+		NewFilter("u1", []validator.Validator{validator.Optional(), validator.OmitEmpty(), validator.Url()}),
+		NewFilter("u2", []validator.Validator{validator.Optional(), validator.OmitEmpty(), validator.Url()}),
+		NewFilter("u3", []validator.Validator{validator.Required(), validator.Url()}),
+		NewFilter("u4", []validator.Validator{validator.Required(), validator.Url()}),
+		NewFilter("u5", []validator.Validator{validator.Required(), validator.Url()}),
+		NewFilter("u6", []validator.Validator{validator.Required(), validator.Url()}),
 	}
 	_, _, err = Validate(params, rules)
 	if err != nil {
@@ -157,8 +157,8 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"p1": "15810562936",
 	}
-	rules = map[string]validator.FilterItem{
-		"p1": Filter([]validator.Validator{validator.Optional(), validator.OmitEmpty(), validator.Phone()}),
+	rules = []validator.FilterItem{
+		NewFilter("p1", []validator.Validator{validator.Optional(), validator.OmitEmpty(), validator.Phone()}),
 	}
 	_, _, err = Validate(params, rules)
 	if err != nil {
@@ -167,8 +167,8 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"p2": "12810562936",
 	}
-	rules = map[string]validator.FilterItem{
-		"p2": Filter([]validator.Validator{validator.Optional(), validator.OmitEmpty(), validator.Phone()}),
+	rules = []validator.FilterItem{
+		NewFilter("p2", []validator.Validator{validator.Optional(), validator.OmitEmpty(), validator.Phone()}),
 	}
 	_, _, err = Validate(params, rules)
 	if err == nil {
@@ -179,8 +179,8 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"ip1": "127.127.127.127",
 	}
-	rules = map[string]validator.FilterItem{
-		"ip1": Filter([]validator.Validator{validator.Required(), validator.Ipv4()}),
+	rules = []validator.FilterItem{
+		NewFilter("ip1", []validator.Validator{validator.Required(), validator.Ipv4()}),
 	}
 	_, _, err = Validate(params, rules)
 	if err != nil {
@@ -189,8 +189,8 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"ip2": "127.333.1.1",
 	}
-	rules = map[string]validator.FilterItem{
-		"ip2": Filter([]validator.Validator{validator.Required(), validator.Ipv4()}),
+	rules = []validator.FilterItem{
+		NewFilter("ip2", []validator.Validator{validator.Required(), validator.Ipv4()}),
 	}
 	_, _, err = Validate(params, rules)
 	if err == nil {
@@ -202,9 +202,9 @@ func TestValidate(t *testing.T) {
 		"d1": "2021-10-11 15:33:21",
 		"d2": "2021-10-11",
 	}
-	rules = map[string]validator.FilterItem{
-		"d1": Filter([]validator.Validator{validator.Required(), validator.Datetime()}),
-		"d2": Filter([]validator.Validator{validator.Required(), validator.Date()}),
+	rules = []validator.FilterItem{
+		NewFilter("d1", []validator.Validator{validator.Required(), validator.Datetime()}),
+		NewFilter("d2", []validator.Validator{validator.Required(), validator.Date()}),
 	}
 	_, _, err = Validate(params, rules)
 	if err != nil {
@@ -214,8 +214,8 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"d3": "2021-1-11 15:33:21",
 	}
-	rules = map[string]validator.FilterItem{
-		"d3": Filter([]validator.Validator{validator.Required(), validator.Datetime()}),
+	rules = []validator.FilterItem{
+		NewFilter("d3", []validator.Validator{validator.Required(), validator.Datetime()}),
 	}
 	_, _, err = Validate(params, rules)
 	if err == nil {
@@ -227,9 +227,9 @@ func TestValidate(t *testing.T) {
 		"l1": "字符长度5",
 		"r1": 99,
 	}
-	rules = map[string]validator.FilterItem{
-		"l1": Filter([]validator.Validator{validator.Required(), validator.Length(4, 6)}),
-		"r1": Filter([]validator.Validator{validator.Required(), validator.Between(1, 100)}),
+	rules = []validator.FilterItem{
+		NewFilter("l1", []validator.Validator{validator.Required(), validator.Length(4, 6)}),
+		NewFilter("r1", []validator.Validator{validator.Required(), validator.Between(1, 100)}),
 	}
 	_, _, err = Validate(params, rules)
 	if err != nil {
@@ -239,8 +239,8 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"l3": "2021-1-11 15:33:21",
 	}
-	rules = map[string]validator.FilterItem{
-		"dl": Filter([]validator.Validator{validator.Required(), validator.Length(1, 2)}),
+	rules = []validator.FilterItem{
+		NewFilter("dl", []validator.Validator{validator.Required(), validator.Length(1, 2)}),
 	}
 	_, _, err = Validate(params, rules)
 	if err == nil {
@@ -252,9 +252,9 @@ func TestValidate(t *testing.T) {
 		"ei1": 3,
 		"es1": "man",
 	}
-	rules = map[string]validator.FilterItem{
-		"ei1": Filter([]validator.Validator{validator.Required(), validator.EnumInt([]int{1, 2, 3, 4})}),
-		"es1": Filter([]validator.Validator{validator.Required(), validator.EnumString([]string{"man", "feman"})}),
+	rules = []validator.FilterItem{
+		NewFilter("ei1", []validator.Validator{validator.Required(), validator.EnumInt([]int{1, 2, 3, 4})}),
+		NewFilter("es1", []validator.Validator{validator.Required(), validator.EnumString([]string{"man", "feman"})}),
 	}
 	_, _, err = Validate(params, rules)
 	if err != nil {
@@ -265,8 +265,8 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"di1": "1,2,3,4",
 	}
-	rules = map[string]validator.FilterItem{
-		"di1": Filter([]validator.Validator{validator.Required(), validator.DotInt(), validator.Maxdot(5), validator.Dotint2Slice()}),
+	rules = []validator.FilterItem{
+		NewFilter("di1", []validator.Validator{validator.Required(), validator.DotInt(), validator.Maxdot(5), validator.Dotint2Slice()}),
 	}
 	res, _, err = Validate(params, rules)
 	if err != nil {
@@ -284,8 +284,8 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"r1": "034433332",
 	}
-	rules = map[string]validator.FilterItem{
-		"r1": Filter([]validator.Validator{validator.Required(), validator.Regex("^[0-9]*$")}),
+	rules = []validator.FilterItem{
+		NewFilter("r1", []validator.Validator{validator.Required(), validator.Regex("^[0-9]*$")}),
 	}
 	_, _, err = Validate(params, rules)
 	if err != nil {
@@ -297,10 +297,10 @@ func TestValidate(t *testing.T) {
 		"curpage": 2,
 		"perpage": 14,
 	}
-	rules = map[string]validator.FilterItem{
-		"curpage": Filter([]validator.Validator{validator.Optional(1), validator.Int()}),
-		"perpage": Filter([]validator.Validator{validator.Optional(13), validator.Int()}),
-		"x":       Filter([]validator.Validator{validator.Paginate()}),
+	rules = []validator.FilterItem{
+		NewFilter("curpage", []validator.Validator{validator.Optional(1), validator.Int()}),
+		NewFilter("perpage", []validator.Validator{validator.Optional(13), validator.Int()}),
+		NewFilter("x", []validator.Validator{validator.Paginate()}),
 	}
 	res, _, err = Validate(params, rules)
 	if err != nil {
@@ -323,8 +323,8 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"s1": []string{"1", "2"},
 	}
-	rules = map[string]validator.FilterItem{
-		"s1": Filter([]validator.Validator{validator.Required(), validator.IntSlice("切片异常", executor.EnumInt([]int{1, 2, 3, 4}))}),
+	rules = []validator.FilterItem{
+		NewFilter("s1", []validator.Validator{validator.Required(), validator.IntSlice("切片异常", executor.EnumInt([]int{1, 2, 3, 4}))}),
 	}
 	_, _, err = Validate(params, rules)
 	if err != nil {
@@ -337,8 +337,8 @@ func BenchmarkValidate(b *testing.B) {
 		params := map[string]interface{}{
 			"name": "1",
 		}
-		rules := map[string]validator.FilterItem{
-			"name": Filter([]validator.Validator{validator.Int()}),
+		rules := []validator.FilterItem{
+			NewFilter("name", []validator.Validator{validator.Int()}),
 		}
 		_, _, _ = Validate(params, rules)
 	}

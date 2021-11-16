@@ -8,9 +8,10 @@ import (
 	"github.com/rumis/govalidate/validator"
 )
 
-// Filter 构建新的FilterItem对象
-func Filter(rules []validator.Validator, errMsgCode ...string) validator.FilterItem {
+// NewFilter 构建新的FilterItem对象
+func NewFilter(key string, rules []validator.Validator, errMsgCode ...string) validator.FilterItem {
 	item := validator.FilterItem{
+		Key:   key,
 		Rules: rules,
 	}
 	if len(errMsgCode) > 0 {
@@ -24,12 +25,13 @@ func Filter(rules []validator.Validator, errMsgCode ...string) validator.FilterI
 }
 
 // Validate 校验
-func Validate(params map[string]interface{}, rules map[string]validator.FilterItem) (map[string]interface{}, int32, error) {
+func Validate(params map[string]interface{}, rules []validator.FilterItem) (map[string]interface{}, int32, error) {
 	if len(rules) == 0 {
 		return nil, 0, nil
 	}
 	vRes := make(map[string]interface{})
-	for key, filter := range rules {
+	for _, filter := range rules {
+		key := filter.Key
 		paramVal, ok := params[key]
 		if !ok {
 			paramVal = nil
