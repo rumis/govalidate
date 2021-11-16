@@ -1,7 +1,6 @@
 package executor
 
 import (
-	"encoding/json"
 	"net"
 	"net/url"
 	"reflect"
@@ -135,36 +134,14 @@ func Regex(reg string) StringExecutor {
 	}
 }
 
+// IsNil 判定是否为空
 func IsNil(val interface{}) bool {
 	if val == nil {
 		return true
 	}
-	switch v := val.(type) {
-	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
-		if v == 0 {
-			return true
-		}
-	case float32, float64:
-		if v == 0 {
-			return true
-		}
-	case string:
-		if len(v) == 0 {
-			return true
-		}
-	case json.Number:
-		vi, err := v.Int64()
-		if err != nil {
-			return true
-		}
-		if vi == 0 {
-			return true
-		}
-	default:
-		vo := reflect.ValueOf(val)
-		if vo.IsNil() || vo.IsZero() || !vo.IsValid() {
-			return true
-		}
+	vo := reflect.ValueOf(val)
+	if vo.IsNil() || !vo.IsValid() {
+		return true
 	}
 	return false
 }
