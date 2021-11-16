@@ -143,7 +143,7 @@ func TestValidate(t *testing.T) {
 	}
 	rules = []validator.FilterItem{
 		NewFilter("u1", []validator.Validator{validator.Optional(), validator.OmitEmpty(), validator.Url()}),
-		NewFilter("u2", []validator.Validator{validator.Optional(), validator.OmitEmpty(), validator.Url()}),
+		NewFilter("u2", []validator.Validator{validator.Optional(), validator.EmptyString(), validator.Url()}),
 		NewFilter("u3", []validator.Validator{validator.Required(), validator.Url()}),
 		NewFilter("u4", []validator.Validator{validator.Required(), validator.Url()}),
 		NewFilter("u5", []validator.Validator{validator.Required(), validator.Url()}),

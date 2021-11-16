@@ -140,8 +140,10 @@ func IsNil(val interface{}) bool {
 		return true
 	}
 	vo := reflect.ValueOf(val)
-	if vo.IsNil() || !vo.IsValid() {
-		return true
+	if vo.Kind() == reflect.Interface || vo.Kind() == reflect.Ptr {
+		if vo.IsNil() || !vo.IsValid() {
+			return true
+		}
 	}
 	return false
 }
