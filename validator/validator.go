@@ -296,6 +296,23 @@ func Dotint2Slice() Validator {
 	}
 }
 
+// Dotint64ToSlice 逗号分隔的ID字符串转为数组
+func Dotint64ToSlice() Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		val, _ := utils.GetStringValue(opts.Value)
+		vals := strings.Split(val, ",")
+		if len(vals) > 0 {
+			ids := make([]int64, len(vals))
+			for idx, id := range vals {
+				i, _ := strconv.ParseInt(id, 10, 64)
+				ids[idx] = i
+			}
+			opts.Value = ids
+		}
+		return Succ()
+	}
+}
+
 // Regex 正则表达式
 func Regex(reg string, emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
