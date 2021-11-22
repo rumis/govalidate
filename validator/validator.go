@@ -23,7 +23,7 @@ func Optional(defaultVal ...interface{}) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
 		if executor.IsNil(opts.Value) && len(defaultVal) != 0 {
 			opts.Value = defaultVal[0]
-			return Break()
+			return Succ()
 		}
 		if executor.IsNil(opts.Value) {
 			return Break()
