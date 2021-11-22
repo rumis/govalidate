@@ -23,6 +23,10 @@ func Optional(defaultVal ...interface{}) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
 		if executor.IsNil(opts.Value) && len(defaultVal) != 0 {
 			opts.Value = defaultVal[0]
+			return Break()
+		}
+		if executor.IsNil(opts.Value) {
+			return Break()
 		}
 		return Succ()
 	}
@@ -48,6 +52,18 @@ func Float(emsg ...string) Validator {
 			return Fail(emsg)
 		}
 		opts.Value = v
+		return Succ()
+	}
+}
+
+// String 类型为字符串
+func String(emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		str, ok := utils.GetStringValue(opts.Value)
+		if !ok || len(str) == 0 {
+			return Fail(emsg)
+		}
+		opts.Value = str
 		return Succ()
 	}
 }
