@@ -12,10 +12,12 @@ func TestValidate(t *testing.T) {
 
 	// base
 	params := map[string]interface{}{
-		"age": 1,
+		"age":  1,
+		"sage": "2",
 	}
 	rules := []validator.FilterItem{
 		NewFilter("age", []validator.Validator{validator.Int()}),
+		NewFilter("sage", []validator.Validator{validator.String2Int64(), validator.Int()}),
 	}
 	res, _, err := Validate(params, rules)
 	if err != nil {

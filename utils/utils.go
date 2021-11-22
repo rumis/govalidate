@@ -46,12 +46,6 @@ func GetIntValue(val interface{}) (int, bool) {
 		return int(v), true
 	case int:
 		return int(v), true
-	case string:
-		vint, err := strconv.Atoi(v)
-		if err != nil {
-			return 0, false
-		}
-		return vint, true
 	case json.Number:
 		v64, err := v.Int64()
 		if err != nil {
@@ -89,12 +83,6 @@ func GetFloatValue(val interface{}) (float64, bool) {
 		return float64(v), true
 	case float64:
 		return v, true
-	case string:
-		vf, err := strconv.ParseFloat(v, 64)
-		if err != nil {
-			return 0, false
-		}
-		return vf, true
 	case json.Number:
 		v64, err := v.Float64()
 		if err != nil {
@@ -108,30 +96,6 @@ func GetFloatValue(val interface{}) (float64, bool) {
 // GetStringValue 获取字符串
 func GetStringValue(val interface{}) (string, bool) {
 	switch v := val.(type) {
-	case uint8:
-		return strconv.FormatUint(uint64(v), 10), true
-	case uint16:
-		return strconv.FormatUint(uint64(v), 10), true
-	case uint32:
-		return strconv.FormatUint(uint64(v), 10), true
-	case uint64:
-		return strconv.FormatUint(uint64(v), 10), true
-	case uint:
-		return strconv.FormatUint(uint64(v), 10), true
-	case int8:
-		return strconv.FormatInt(int64(v), 10), true
-	case int16:
-		return strconv.FormatInt(int64(v), 10), true
-	case int32:
-		return strconv.FormatInt(int64(v), 10), true
-	case int64:
-		return strconv.FormatInt(v, 10), true
-	case int:
-		return strconv.FormatInt(int64(v), 10), true
-	case float32:
-		return strconv.FormatFloat(float64(v), 'f', -1, 32), true
-	case float64:
-		return strconv.FormatFloat(float64(v), 'f', -1, 32), true
 	case string:
 		return v, true
 	case json.Number:

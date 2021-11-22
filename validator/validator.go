@@ -23,6 +23,10 @@ func Optional(defaultVal ...interface{}) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
 		if executor.IsNil(opts.Value) && len(defaultVal) != 0 {
 			opts.Value = defaultVal[0]
+			return Break()
+		}
+		if executor.IsNil(opts.Value) {
+			return Break()
 		}
 		return Succ()
 	}
@@ -60,6 +64,22 @@ func EmptyString() Validator {
 			return Break()
 		}
 		opts.Value = str
+		return Succ()
+	}
+}
+
+// 将传参String改为Int
+func String2Int64(emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		str, ok := opts.Value.(string)
+		if !ok || len(str) == 0 {
+			return Fail(emsg)
+		}
+		ival, err := strconv.ParseInt(str, 10, 64)
+		if err != nil {
+			return Fail(emsg)
+		}
+		opts.Value = ival
 		return Succ()
 	}
 }
