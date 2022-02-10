@@ -47,6 +47,9 @@ func GetIntValue(val interface{}) (int, bool) {
 	case int:
 		return int(v), true
 	case string:
+		if v == "" {
+			return 0, true
+		}
 		vint, err := strconv.Atoi(v)
 		if err != nil {
 			return 0, false
