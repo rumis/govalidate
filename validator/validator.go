@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/forPelevin/gomoji"
 	"github.com/rumis/govalidate/executor"
 	"github.com/rumis/govalidate/utils"
 )
@@ -477,6 +478,19 @@ func StringSlice(msgExecutor ...interface{}) Validator {
 			}
 		}
 		opts.Value = vals
+		return Succ()
+	}
+}
+
+// RemoveEmoji 删除表情符号
+func RemoveEmoji() Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		v, ok := opts.Value.(string)
+		if !ok {
+			// 如果目标格式不为字符串，跳过
+			return Succ()
+		}
+		opts.Value = gomoji.RemoveEmojis(v)
 		return Succ()
 	}
 }

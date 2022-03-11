@@ -330,6 +330,31 @@ func TestValidate(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+
+	// 表情符号-删除
+	params = map[string]interface{}{
+		"e1": "emoji🤣",
+		"e2": "emo🩸ji",
+		"e3": "❤️emoji",
+	}
+	rules = []validator.FilterItem{
+		NewFilter("e1", []validator.Validator{validator.RemoveEmoji()}),
+		NewFilter("e2", []validator.Validator{validator.RemoveEmoji()}),
+		NewFilter("e3", []validator.Validator{validator.RemoveEmoji()}),
+	}
+	es, _, err := Validate(params, rules)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if e1, ok := es["e1"].(string); !ok || e1 != "emoji" {
+		t.Fatal("e1")
+	}
+	if e2, ok := es["e2"].(string); !ok || e2 != "emoji" {
+		t.Fatal("e2")
+	}
+	if e3, ok := es["e3"].(string); !ok || e3 != "emoji" {
+		t.Fatal("e3")
+	}
 }
 
 func BenchmarkValidate(b *testing.B) {
