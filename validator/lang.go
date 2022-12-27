@@ -11,3 +11,8 @@ var localizerKey string = "i18n-localizer-key"
 func InitLocalizerKey(lkey string) {
 	localizerKey = lkey
 }
+
+// GetLocalizerKey 获取Localizer Key
+func GetLocalizerKey() string {
+	return localizerKey
+}
