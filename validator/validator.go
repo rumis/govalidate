@@ -19,6 +19,16 @@ func Required(emsg ...string) Validator {
 	}
 }
 
+// RequiredMultiLang 多语言
+func RequiredMultiLang(emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		if opts.Value != nil {
+			return Succ()
+		}
+		return FailMultiLang(emsg)
+	}
+}
+
 // Optional 参数可选，可设置默认值
 func Optional(defaultVal ...interface{}) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
@@ -45,6 +55,18 @@ func Int(emsg ...string) Validator {
 	}
 }
 
+// IntMultiLang 多语言参数为整形
+func IntMultiLang(emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		v, ok := utils.GetIntValue(opts.Value)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		opts.Value = v
+		return Succ()
+	}
+}
+
 // Float 浮点数
 func Float(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
@@ -57,12 +79,36 @@ func Float(emsg ...string) Validator {
 	}
 }
 
+// FloatMultiLang 多语言浮点数
+func FloatMultiLang(emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		v, ok := utils.GetFloatValue(opts.Value)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		opts.Value = v
+		return Succ()
+	}
+}
+
 // String 类型为字符串
 func String(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
 		str, ok := utils.GetStringValue(opts.Value)
 		if !ok || len(str) == 0 {
 			return Fail(emsg)
+		}
+		opts.Value = str
+		return Succ()
+	}
+}
+
+// StringMultiLang 多语言-类型为字符串
+func StringMultiLang(emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		str, ok := utils.GetStringValue(opts.Value)
+		if !ok || len(str) == 0 {
+			return FailMultiLang(emsg)
 		}
 		opts.Value = str
 		return Succ()
@@ -113,6 +159,18 @@ func Boolean(emsg ...string) Validator {
 	}
 }
 
+// BooleanMultiLang 多语言布尔值
+func BooleanMultiLang(emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		v, ok := utils.GetBooleanValue(opts.Value)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		opts.Value = v
+		return Succ()
+	}
+}
+
 // Email 邮件
 func Email(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
@@ -123,6 +181,21 @@ func Email(emsg ...string) Validator {
 		ok = executor.Email(val)
 		if !ok {
 			return Fail(emsg)
+		}
+		return Succ()
+	}
+}
+
+// EmailMultiLang 邮件
+func EmailMultiLang(emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		val, ok := utils.GetStringValue(opts.Value)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		ok = executor.Email(val)
+		if !ok {
+			return FailMultiLang(emsg)
 		}
 		return Succ()
 	}
@@ -143,6 +216,21 @@ func Url(emsg ...string) Validator {
 	}
 }
 
+// UrlMultiLang 多语言-URL链接
+func UrlMultiLang(emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		val, ok := utils.GetStringValue(opts.Value)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		ok = executor.Url(val)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		return Succ()
+	}
+}
+
 // Phone 手机号码
 func Phone(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
@@ -153,6 +241,21 @@ func Phone(emsg ...string) Validator {
 		ok = executor.Phone(val)
 		if !ok {
 			return Fail(emsg)
+		}
+		return Succ()
+	}
+}
+
+// PhoneMultiLang 多语言 手机号码
+func PhoneMultiLang(emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		val, ok := utils.GetStringValue(opts.Value)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		ok = executor.Phone(val)
+		if !ok {
+			return FailMultiLang(emsg)
 		}
 		return Succ()
 	}
@@ -173,6 +276,21 @@ func Ipv4(emsg ...string) Validator {
 	}
 }
 
+// Ipv4MultiLang ip地址，v4格式 多语言支持
+func Ipv4MultiLang(emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		val, ok := utils.GetStringValue(opts.Value)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		ok = executor.Ipv4(val)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		return Succ()
+	}
+}
+
 // Date 日期，格式： 2006-01-02
 func Date(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
@@ -183,6 +301,21 @@ func Date(emsg ...string) Validator {
 		ok = executor.Date(val)
 		if !ok {
 			return Fail(emsg)
+		}
+		return Succ()
+	}
+}
+
+// DateMultiLang 日期，格式： 2006-01-02 多语言支持
+func DateMultiLang(emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		val, ok := utils.GetStringValue(opts.Value)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		ok = executor.Date(val)
+		if !ok {
+			return FailMultiLang(emsg)
 		}
 		return Succ()
 	}
@@ -203,6 +336,21 @@ func Datetime(emsg ...string) Validator {
 	}
 }
 
+// DatetimeMultiLang  多语言 时间，格式：2006-01-02 15:04:05
+func DatetimeMultiLang(emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		val, ok := utils.GetStringValue(opts.Value)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		ok = executor.Datetime(val)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		return Succ()
+	}
+}
+
 // Length 字符串字符长度限制 [min,max]
 func Length(min int, max int, emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
@@ -213,6 +361,21 @@ func Length(min int, max int, emsg ...string) Validator {
 		ok = executor.Length(min, max)(val)
 		if !ok {
 			return Fail(emsg)
+		}
+		return Succ()
+	}
+}
+
+// LengthMultiLang 字符串字符长度限制 [min,max]
+func LengthMultiLang(min int, max int, emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		val, ok := utils.GetStringValue(opts.Value)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		ok = executor.Length(min, max)(val)
+		if !ok {
+			return FailMultiLang(emsg)
 		}
 		return Succ()
 	}
@@ -233,6 +396,21 @@ func Between(min int, max int, emsg ...string) Validator {
 	}
 }
 
+// BetweenMultiLang 数字值范围限制 [min,max] - 多语言支持
+func BetweenMultiLang(min int, max int, emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		val, ok := utils.GetIntValue(opts.Value)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		ok = executor.Between(min, max)(val)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		return Succ()
+	}
+}
+
 // EnumInt 枚举，值类型为整形
 func EnumInt(enums []int, emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
@@ -243,6 +421,22 @@ func EnumInt(enums []int, emsg ...string) Validator {
 		ok = executor.EnumInt(enums)(val)
 		if !ok {
 			return Fail(emsg)
+		}
+		opts.Value = val
+		return Succ()
+	}
+}
+
+// EnumIntMultiLang 枚举，值类型为整形
+func EnumIntMultiLang(enums []int, emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		val, ok := utils.GetIntValue(opts.Value)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		ok = executor.EnumInt(enums)(val)
+		if !ok {
+			return FailMultiLang(emsg)
 		}
 		opts.Value = val
 		return Succ()
@@ -265,6 +459,22 @@ func EnumString(enums []string, emsg ...string) Validator {
 	}
 }
 
+// EnumStringMultiLang 多语言版本 枚举，值类型为字符串
+func EnumStringMultiLang(enums []string, emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		val, ok := utils.GetStringValue(opts.Value)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		ok = executor.EnumString(enums)(val)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		opts.Value = val
+		return Succ()
+	}
+}
+
 // DotInt 英文逗号分隔的整数
 func DotInt(emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
@@ -280,6 +490,21 @@ func DotInt(emsg ...string) Validator {
 	}
 }
 
+// DotIntMultiLang 多语言支持 英文逗号分隔的整数
+func DotIntMultiLang(emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		val, ok := utils.GetStringValue(opts.Value)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		ok = executor.DotInt(val)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		return Succ()
+	}
+}
+
 // Maxdot 逗号分隔的ID支持的最多ID个数
 func Maxdot(max int, emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
@@ -290,6 +515,21 @@ func Maxdot(max int, emsg ...string) Validator {
 		dotCnt := strings.Count(val, ",")
 		if dotCnt+1 > max {
 			return Fail(emsg)
+		}
+		return Succ()
+	}
+}
+
+// MaxdotMultiLang 多语言支持 逗号分隔的ID支持的最多ID个数
+func MaxdotMultiLang(max int, emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		val, ok := utils.GetStringValue(opts.Value)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		dotCnt := strings.Count(val, ",")
+		if dotCnt+1 > max {
+			return FailMultiLang(emsg)
 		}
 		return Succ()
 	}
@@ -340,6 +580,21 @@ func Regex(reg string, emsg ...string) Validator {
 		ok = executor.Regex(reg)(val)
 		if !ok {
 			return Fail(emsg)
+		}
+		return Succ()
+	}
+}
+
+// Regex 正则表达式
+func RegexMultiLang(reg string, emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		val, ok := utils.GetStringValue(opts.Value)
+		if !ok {
+			return FailMultiLang(emsg)
+		}
+		ok = executor.Regex(reg)(val)
+		if !ok {
+			return FailMultiLang(emsg)
 		}
 		return Succ()
 	}
@@ -429,6 +684,59 @@ func IntSlice(msgExecutor ...interface{}) Validator {
 	}
 }
 
+// IntSliceMultiLang 整形数组
+// 一个参数：可以是【错误信息】或者是【单个要素的校验条件】，校验条件可为单个或数组
+// 两个参数：第一个参数一定为【错误信息】，第二个参数为【单个要素的校验条件】，校验条件可为单个或数组
+func IntSliceMultiLang(msgExecutor ...interface{}) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		errMsgs := make([]string, 0)
+		execs := make([]executor.IntExecutor, 0)
+		paramLen := len(msgExecutor)
+
+		switch paramLen {
+		case 0:
+			// nothing to do
+		case 1:
+			switch p := msgExecutor[0].(type) {
+			case string:
+				errMsgs = append(errMsgs, p)
+			case executor.IntExecutor:
+				execs = append(execs, p)
+			case []executor.IntExecutor:
+				execs = append(execs, p...)
+			}
+		case 2:
+			errMsg, ok := msgExecutor[0].(string)
+			if !ok {
+				return FailMultiLang(errMsgs)
+			}
+			errMsgs = append(errMsgs, errMsg)
+			switch p := msgExecutor[1].(type) {
+			case executor.IntExecutor:
+				execs = append(execs, p)
+			case []executor.IntExecutor:
+				execs = append(execs, p...)
+			}
+		}
+		vals, ok := utils.GetIntSlice(opts.Value)
+		if !ok {
+			return FailMultiLang(errMsgs)
+		}
+		if len(execs) > 0 {
+			for _, exe := range execs {
+				for _, val := range vals {
+					ok = exe(val)
+					if !ok {
+						return FailMultiLang(errMsgs)
+					}
+				}
+			}
+		}
+		opts.Value = vals
+		return Succ()
+	}
+}
+
 // StringSlice 字符串数组
 // 一个参数：可以是【错误信息】或者是【单个要素的校验条件】，校验条件可为单个或数组
 // 两个参数：第一个参数一定为【错误信息】，第二个参数为【单个要素的校验条件】，校验条件可为单个或数组
@@ -473,6 +781,59 @@ func StringSlice(msgExecutor ...interface{}) Validator {
 					ok = exe(val)
 					if !ok {
 						return Fail(errMsgs)
+					}
+				}
+			}
+		}
+		opts.Value = vals
+		return Succ()
+	}
+}
+
+// StringSliceMultiLang 字符串数组
+// 一个参数：可以是【错误信息】或者是【单个要素的校验条件】，校验条件可为单个或数组
+// 两个参数：第一个参数一定为【错误信息】，第二个参数为【单个要素的校验条件】，校验条件可为单个或数组
+func StringSliceMultiLang(msgExecutor ...interface{}) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		errMsgs := make([]string, 0)
+		execs := make([]executor.StringExecutor, 0)
+		paramLen := len(msgExecutor)
+
+		switch paramLen {
+		case 0:
+			// nothing to do
+		case 1:
+			switch p := msgExecutor[0].(type) {
+			case string:
+				errMsgs = append(errMsgs, p)
+			case executor.StringExecutor:
+				execs = append(execs, p)
+			case []executor.StringExecutor:
+				execs = append(execs, p...)
+			}
+		case 2:
+			errMsg, ok := msgExecutor[0].(string)
+			if !ok {
+				return FailMultiLang(errMsgs)
+			}
+			errMsgs = append(errMsgs, errMsg)
+			switch p := msgExecutor[1].(type) {
+			case executor.StringExecutor:
+				execs = append(execs, p)
+			case []executor.StringExecutor:
+				execs = append(execs, p...)
+			}
+		}
+		vals, ok := utils.GetStringSlice(opts.Value)
+		if !ok {
+			return FailMultiLang(errMsgs)
+		}
+		if len(execs) > 0 {
+			for _, exe := range execs {
+				for _, val := range vals {
+					ok = exe(val)
+					if !ok {
+						return FailMultiLang(errMsgs)
 					}
 				}
 			}

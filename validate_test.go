@@ -1,6 +1,7 @@
 package govalidate
 
 import (
+	"context"
 	"testing"
 
 	"github.com/rumis/govalidate/executor"
@@ -14,7 +15,7 @@ func TestValidate(t *testing.T) {
 	params := map[string]interface{}{
 		"age": 1,
 	}
-	rules := []validator.FilterItem{
+	rules := []validator.Filter{
 		NewFilter("age", []validator.Validator{validator.Int()}),
 	}
 	res, _, err := Validate(params, rules)
@@ -29,7 +30,7 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"age": "s",
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("age", []validator.Validator{validator.Int()}, "错误信息", "10086"),
 	}
 	_, code, err := Validate(params, rules)
@@ -41,7 +42,7 @@ func TestValidate(t *testing.T) {
 	}
 
 	// required
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("name", []validator.Validator{validator.Required("参数X必须")}),
 	}
 	_, _, err = Validate(params, rules)
@@ -50,7 +51,7 @@ func TestValidate(t *testing.T) {
 	}
 
 	// optional
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("name", []validator.Validator{validator.Optional("默认值")}),
 		NewFilter("grade", []validator.Validator{validator.Optional()}),
 	}
@@ -74,7 +75,7 @@ func TestValidate(t *testing.T) {
 		"name5": "true",
 		"name6": 2,
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("name1", []validator.Validator{validator.Int()}),
 		NewFilter("name2", []validator.Validator{validator.OmitEmpty()}),
 		NewFilter("name3", []validator.Validator{validator.Float()}),
@@ -115,7 +116,7 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"e1": "liumurong1@tal.com",
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("e1", []validator.Validator{validator.Required(), validator.Email()}),
 	}
 	_, _, err = Validate(params, rules)
@@ -125,7 +126,7 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"e1": "@tal.com",
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("e1", []validator.Validator{validator.Required(), validator.Email()}),
 	}
 	_, _, err = Validate(params, rules)
@@ -141,7 +142,7 @@ func TestValidate(t *testing.T) {
 		"u5": "https://www.baidu.com?x=3",
 		"u6": "https://www.baidu.com#de",
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("u1", []validator.Validator{validator.Optional(), validator.OmitEmpty(), validator.Url()}),
 		NewFilter("u2", []validator.Validator{validator.Optional(), validator.EmptyString(), validator.Url()}),
 		NewFilter("u3", []validator.Validator{validator.Required(), validator.Url()}),
@@ -157,7 +158,7 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"p1": "15810562936",
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("p1", []validator.Validator{validator.Optional(), validator.OmitEmpty(), validator.Phone()}),
 	}
 	_, _, err = Validate(params, rules)
@@ -167,7 +168,7 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"p2": "12810562936",
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("p2", []validator.Validator{validator.Optional(), validator.OmitEmpty(), validator.Phone()}),
 	}
 	_, _, err = Validate(params, rules)
@@ -179,7 +180,7 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"ip1": "127.127.127.127",
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("ip1", []validator.Validator{validator.Required(), validator.Ipv4()}),
 	}
 	_, _, err = Validate(params, rules)
@@ -189,7 +190,7 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"ip2": "127.333.1.1",
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("ip2", []validator.Validator{validator.Required(), validator.Ipv4()}),
 	}
 	_, _, err = Validate(params, rules)
@@ -202,7 +203,7 @@ func TestValidate(t *testing.T) {
 		"d1": "2021-10-11 15:33:21",
 		"d2": "2021-10-11",
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("d1", []validator.Validator{validator.Required(), validator.Datetime()}),
 		NewFilter("d2", []validator.Validator{validator.Required(), validator.Date()}),
 	}
@@ -214,7 +215,7 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"d3": "2021-1-11 15:33:21",
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("d3", []validator.Validator{validator.Required(), validator.Datetime()}),
 	}
 	_, _, err = Validate(params, rules)
@@ -227,7 +228,7 @@ func TestValidate(t *testing.T) {
 		"l1": "字符长度5",
 		"r1": 99,
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("l1", []validator.Validator{validator.Required(), validator.Length(4, 6)}),
 		NewFilter("r1", []validator.Validator{validator.Required(), validator.Between(1, 100)}),
 	}
@@ -239,7 +240,7 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"l3": "2021-1-11 15:33:21",
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("dl", []validator.Validator{validator.Required(), validator.Length(1, 2)}),
 	}
 	_, _, err = Validate(params, rules)
@@ -252,7 +253,7 @@ func TestValidate(t *testing.T) {
 		"ei1": 3,
 		"es1": "man",
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("ei1", []validator.Validator{validator.Required(), validator.EnumInt([]int{1, 2, 3, 4})}),
 		NewFilter("es1", []validator.Validator{validator.Required(), validator.EnumString([]string{"man", "feman"})}),
 	}
@@ -265,7 +266,7 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"di1": "1,2,3,4",
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("di1", []validator.Validator{validator.Required(), validator.DotInt(), validator.Maxdot(5), validator.Dotint2Slice()}),
 	}
 	res, _, err = Validate(params, rules)
@@ -284,7 +285,7 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"r1": "034433332",
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("r1", []validator.Validator{validator.Required(), validator.Regex("^[0-9]*$")}),
 	}
 	_, _, err = Validate(params, rules)
@@ -297,7 +298,7 @@ func TestValidate(t *testing.T) {
 		"curpage": 2,
 		"perpage": 14,
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("curpage", []validator.Validator{validator.Optional(1), validator.Int()}),
 		NewFilter("perpage", []validator.Validator{validator.Optional(13), validator.Int()}),
 		NewFilter("x", []validator.Validator{validator.Paginate()}),
@@ -323,7 +324,7 @@ func TestValidate(t *testing.T) {
 	params = map[string]interface{}{
 		"s1": []string{"1", "2"},
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("s1", []validator.Validator{validator.Required(), validator.IntSlice("切片异常", executor.EnumInt([]int{1, 2, 3, 4}))}),
 	}
 	_, _, err = Validate(params, rules)
@@ -337,7 +338,7 @@ func TestValidate(t *testing.T) {
 		"e2": "emo🩸ji",
 		"e3": "❤️emoji",
 	}
-	rules = []validator.FilterItem{
+	rules = []validator.Filter{
 		NewFilter("e1", []validator.Validator{validator.RemoveEmoji()}),
 		NewFilter("e2", []validator.Validator{validator.RemoveEmoji()}),
 		NewFilter("e3", []validator.Validator{validator.RemoveEmoji()}),
@@ -357,12 +358,39 @@ func TestValidate(t *testing.T) {
 	}
 }
 
+func TestMultiLangValidate(t *testing.T) {
+
+	validator.InitLocalizerKey("localize-key")
+	ctx := context.WithValue(context.Background(), "localize-key", TestLocalize{})
+
+	// base
+	params := map[string]interface{}{
+		"age": "s1",
+	}
+	rules := []validator.Filter{
+		NewMultiLangFilter("age", []validator.Validator{validator.IntMultiLang()}, "总错误"),
+	}
+	res, _, err := Validate1(ctx, params, rules)
+	if err != nil {
+		t.Error(err)
+	}
+	if _, ok := res["age"]; !ok {
+		t.Error("param age not found")
+	}
+}
+
+type TestLocalize struct{}
+
+func (t TestLocalize) Localize(id string) string {
+	return id + "：多语言测试"
+}
+
 func BenchmarkValidate(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		params := map[string]interface{}{
 			"name": "1",
 		}
-		rules := []validator.FilterItem{
+		rules := []validator.Filter{
 			NewFilter("name", []validator.Validator{validator.Int()}),
 		}
 		_, _, _ = Validate(params, rules)
