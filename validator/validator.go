@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -852,6 +853,25 @@ func RemoveEmoji() Validator {
 			return Succ()
 		}
 		opts.Value = gomoji.RemoveEmojis(v)
+		return Succ()
+	}
+}
+
+// XSS 过滤XSS内容
+func XSS() Validator {
+	s1 := "<(\\/?)(script|iframe|style|html|body|title|link|meta|object|\\?|\\%)([^>]*?)>"
+	s2 := "(<[^>]*)on[a-zA-Z]+\\s*=([^>]*>)"
+	s1Reg := regexp.MustCompile(s1)
+	s2Reg := regexp.MustCompile(s2)
+	return func(opts *ValidateOptions) ValidateResult {
+		val, ok := opts.Value.(string)
+		if !ok {
+			// 如果目标格式不为字符串，跳过
+			return Succ()
+		}
+		val = s1Reg.ReplaceAllString(val, "")
+		val = s2Reg.ReplaceAllString(val, "")
+		opts.Value = val
 		return Succ()
 	}
 }

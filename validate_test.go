@@ -356,6 +356,32 @@ func TestValidate(t *testing.T) {
 	if e3, ok := es["e3"].(string); !ok || e3 != "emoji" {
 		t.Fatal("e3")
 	}
+
+	// XSS
+	params = map[string]interface{}{
+		"e0": "<abc>",
+		"e1": "<img/src/onerror=alert(111)>",
+		"e2": "<script>alert(111)</script>",
+	}
+	rules = []validator.Filter{
+		NewFilter("e0", []validator.Validator{validator.XSS()}),
+		NewFilter("e1", []validator.Validator{validator.XSS()}),
+		NewFilter("e2", []validator.Validator{validator.XSS()}),
+	}
+	xss1, _, err := Validate(params, rules)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if e1, ok := xss1["e0"].(string); !ok || e1 != "<abc>" {
+		t.Fatal("xss1")
+	}
+	if e2, ok := xss1["e1"].(string); !ok || e2 != "" {
+		t.Fatal("xss2")
+	}
+	if e3, ok := xss1["e2"].(string); !ok || e3 != "alert(111)" {
+		t.Fatal("xss3")
+	}
+
 }
 
 func TestMultiLangValidate(t *testing.T) {
