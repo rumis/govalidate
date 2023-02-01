@@ -859,8 +859,8 @@ func RemoveEmoji() Validator {
 
 // XSS 过滤XSS内容
 func XSS() Validator {
-	s1 := "<(\\/?)(script|iframe|style|html|body|title|link|meta|object|\\?|\\%)([^>]*?)>"
-	s2 := "(<[^>]*)on[a-zA-Z]+\\s*=([^>]*>)"
+	s1 := "(?i)<(\\/?)(script|iframe|style|html|body|title|link|meta|object|\\?|\\%)([^>]*?)>"
+	s2 := "(?i)(<[^>]*)on[a-zA-Z]+\\s*=([^>]*>)"
 	s1Reg := regexp.MustCompile(s1)
 	s2Reg := regexp.MustCompile(s2)
 	return func(opts *ValidateOptions) ValidateResult {
