@@ -352,6 +352,21 @@ func DatetimeMultiLang(emsg ...string) Validator {
 	}
 }
 
+// DatetimeRFC3339 时间，格式: 2006-01-02T15:04:05Z
+func DatetimeRFC3339(emsg ...string) Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		val, ok := utils.GetStringValue(opts.Value)
+		if !ok {
+			return Fail(emsg)
+		}
+		ok = executor.DatetimeRFC3339(val)
+		if !ok {
+			return Fail(emsg)
+		}
+		return Succ()
+	}
+}
+
 // Length 字符串字符长度限制 [min,max]
 func Length(min int, max int, emsg ...string) Validator {
 	return func(opts *ValidateOptions) ValidateResult {
@@ -567,6 +582,16 @@ func Dotint64ToSlice() Validator {
 			}
 			opts.Value = ids
 		}
+		return Succ()
+	}
+}
+
+// DotToSlice 将字符串按照逗号分隔拆分为字符串数组
+func DotToSlice() Validator {
+	return func(opts *ValidateOptions) ValidateResult {
+		val, _ := utils.GetStringValue(opts.Value)
+		vals := strings.Split(val, ",")
+		opts.Value = vals
 		return Succ()
 	}
 }

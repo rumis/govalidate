@@ -13,11 +13,6 @@ import (
 // IntExecutor 检查整形值是否符合要求
 type IntExecutor func(val int) bool
 
-// defaultIntExecutor 异常时使用，一定返回false
-func defaultIntExecutor(val int) bool {
-	return false
-}
-
 // StringExecutor 检查字符串值是否符合要求
 type StringExecutor func(val string) bool
 
@@ -70,6 +65,12 @@ func Date(val string) bool {
 // Datetime 时间
 func Datetime(val string) bool {
 	_, err := time.Parse("2006-01-02 15:04:05", val)
+	return err == nil
+}
+
+// RFC3339
+func DatetimeRFC3339(val string) bool {
+	_, err := time.Parse("2006-01-02T15:04:05Z", val)
 	return err == nil
 }
 
