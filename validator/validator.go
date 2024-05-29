@@ -573,6 +573,10 @@ func Dotint2Slice() Validator {
 func Dotint64ToSlice() Validator {
 	return func(opts *ValidateOptions) ValidateResult {
 		val, _ := utils.GetStringValue(opts.Value)
+		if val == "" {
+			opts.Value = []int64{}
+			return Succ()
+		}
 		vals := strings.Split(val, ",")
 		if len(vals) > 0 {
 			ids := make([]int64, len(vals))
@@ -590,6 +594,10 @@ func Dotint64ToSlice() Validator {
 func DotToSlice() Validator {
 	return func(opts *ValidateOptions) ValidateResult {
 		val, _ := utils.GetStringValue(opts.Value)
+		if val == "" {
+			opts.Value = []int{}
+			return Succ()
+		}
 		vals := strings.Split(val, ",")
 		opts.Value = vals
 		return Succ()
